@@ -4,9 +4,8 @@ __lua__
 -- omercan balandi
 -- github.com/obsfx
 -- gamedev utils
---		quadtree
+-- 	quadtree
 -- 	collision detection
--- 	collision resolution
 -- 	debug drawing
 -- 	util functions
 -->8
@@ -86,12 +85,6 @@ function obj(x,y,w,h,de)
 		de=de or false,
 		col=de or false,
 		ovlp=de or false,
-		cea=rectangle(0,0,w*4,h*4),
-	
-		updatecea=function(self)			
-			self.cea.x=self.x-(self.w*2-self.w/2)
-			self.cea.y=self.y-(self.h*2-self.h/2)
-		end
 	}
 	
 	return merge_t(t,rectangle(x,y,w,h))
@@ -99,41 +92,6 @@ end
 -->8
 --collision
 col={
-	colres=function(self,x,y)
-		return {
-			x=x,
-			y=y,
-			
-			l=false,
-			r=false,
-			t=false,
-			b=false
-		}	
-	end,
-	
-	get_deltas=function(self,a,b)
-		local midx1=a:get_mx()
-		local midy1=a:get_my()
-		
-		local midx2=b:get_mx()
-		local midy2=b:get_my()
-		
-		local dx=(midx1-midx2)/a:get_hw()
-		local dy=(midy1-midy2)/a:get_hh()
-		
-		local abs_dx=abs(dx)
-		local abs_dy=abs(dy)
-		local abs_dxy=abs(abs_dx-abs_dy)
-		
-		return {
-			dx=dx,
-			dy=dy,
-			abs_dx=abs_dx,
-			abs_dy=abs_dy,
-			abs_dxy=abs_dxy
-		}
-	end,
-	
 	check=function(self,a,b,incb)
 			local l1=a:get_l()
 			local r1=a:get_r()
@@ -159,57 +117,6 @@ col={
 			
 			return not cond
 	end,
-	
-	resolve=function(self,a,b)
-		local res=self:colres(a.x,a.y)
-
-		local deltas=self:get_deltas(a,b)
-		
-		local dx=deltas.dx
-		local dy=deltas.dy
-		local abs_dx=deltas.abs_dx
-		local abs_dy=deltas.abs_dy
-		local abs_dxy=deltas.abs_dxy
-		
-		a.x=b.x-a.w
-		a.y=b.y-a.h
-		
-		ref_deltas=self:get_deltas(a,b)
-		
-		ref_abs_dx=ref_deltas.abs_dx
-		ref_abs_dy=ref_deltas.abs_dy
-		ref_abs_dxy=ref_deltas.abs_dxy
-		
-		norm_abs_dx=abs(abs_dx-ref_abs_dx)
-		norm_abs_dy=abs(abs_dy-ref_abs_dy)
-		norm_abs_dxy=abs(abs_dxy+ref_abs_dxy)
-		
-		if norm_abs_dxy<0.1 then
-			if dx<0 then res.x=b.x-a.w
-			else res.x=b.x+b.w end
-			
-			if dy<0 then res.y=b.y-a.h
-			else res.y=b.y+b.h end
-		elseif norm_abs_dx<norm_abs_dy then
-			if dx<0 then
-				res.x=b.x-a.w
-				res.r=true
-			else
-				res.x=b.x+b.w
-				res.l=true
-			end
-		else
-			if dy<0 then
-				res.y=b.y-a.h
-				res.b=true
-			else
-				res.y=b.y+b.h
-				res.t=true
-			end
-		end
-		
-		return res
-	end
 }
 -->8
 --qtree
